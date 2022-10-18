@@ -54,8 +54,10 @@
  * function. This is convenient for those who have a different pinmux at boot.
  */
 
-#define GPIO_SET_BIT(REG, BIT) 		REG |= 1UL << BIT
-#define GPIO_CLEAR_BIT(REG, BIT) 	REG &= ~(1UL << BIT)
+#define GPIO_SET_BIT(REG, BIT)      	REG |= 1UL << BIT
+#define GPIO_CLEAR_BIT(REG, BIT)      	REG &= ~(1UL << BIT)
+#define GPIO_SET_BIT_MSK(REG, BIT) 	REG = 0x0101 << BIT
+#define GPIO_CLEAR_BIT_MSK(REG, BIT) 	REG = 0x0100 << BIT
 
 JetsonNanoJtagBitbang::JetsonNanoJtagBitbang(
 		const jtag_pins_conf_t *pin_conf,
@@ -91,9 +93,9 @@ JetsonNanoJtagBitbang::JetsonNanoJtagBitbang(
 	}
 
 	/* Get ports */
-	tms_port_reg = GPIO_PORT_BASE + ((_tms_pin/8)/GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_LARGE_OFFSET) + ((_tms_pin/8)%GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_SHORT_OFFSET);
-	tck_port_reg = GPIO_PORT_BASE + ((_tck_pin/8)/GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_LARGE_OFFSET) + ((_tck_pin/8)%GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_SHORT_OFFSET);
-	tdi_port_reg = GPIO_PORT_BASE + ((_tdi_pin/8)/GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_LARGE_OFFSET) + ((_tdi_pin/8)%GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_SHORT_OFFSET);
+	tms_port_reg = GPIO_PORT_BASE_OUT + ((_tms_pin/8)/GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_LARGE_OFFSET) + ((_tms_pin/8)%GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_SHORT_OFFSET);
+	tck_port_reg = GPIO_PORT_BASE_OUT + ((_tck_pin/8)/GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_LARGE_OFFSET) + ((_tck_pin/8)%GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_SHORT_OFFSET);
+	tdi_port_reg = GPIO_PORT_BASE_OUT + ((_tdi_pin/8)/GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_LARGE_OFFSET) + ((_tdi_pin/8)%GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_SHORT_OFFSET);
 	tdo_port_reg = GPIO_PORT_BASE + ((_tdo_pin/8)/GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_LARGE_OFFSET) + ((_tdo_pin/8)%GPIO_PORT_SHORT_OFFSET_SIZE*GPIO_PORT_SHORT_OFFSET);
 
 	/* Get pin */
@@ -135,19 +137,19 @@ JetsonNanoJtagBitbang::JetsonNanoJtagBitbang(
 	_tdo_port = (gpio_t volatile *)((char *)base + (tdo_port_reg & pagemask));
 
 	// for _tms_port : GPIO OUT
-	GPIO_SET_BIT(_tms_port->CNF, _tms_pin);
-	GPIO_SET_BIT(_tms_port->OE, _tms_pin);
-	GPIO_SET_BIT(_tms_port->OUT, _tms_pin);
+	GPIO_SET_BIT_MSK(_tms_port->CNF, _tms_pin);
+	GPIO_SET_BIT_MSK(_tms_port->OE, _tms_pin);
+	GPIO_SET_BIT_MSK(_tms_port->OUT, _tms_pin);
 
 	// for _tck_port : GPIO OUT
-	GPIO_SET_BIT(_tck_port->CNF, _tck_pin);
-	GPIO_SET_BIT(_tck_port->OE, _tck_pin);
-	GPIO_CLEAR_BIT(_tck_port->OUT, _tck_pin);
+	GPIO_SET_BIT_MSK(_tck_port->CNF, _tck_pin);
+	GPIO_SET_BIT_MSK(_tck_port->OE, _tck_pin);
+	GPIO_CLEAR_BIT_MSK(_tck_port->OUT, _tck_pin);
 
 	// for _tdi_port : GPIO OUT
-	GPIO_SET_BIT(_tdi_port->CNF, _tdi_pin);
-	GPIO_SET_BIT(_tdi_port->OE, _tdi_pin);
-	GPIO_CLEAR_BIT(_tdi_port->OUT, _tdi_pin);
+	GPIO_SET_BIT_MSK(_tdi_port->CNF, _tdi_pin);
+	GPIO_SET_BIT_MSK(_tdi_port->OE, _tdi_pin);
+	GPIO_CLEAR_BIT_MSK(_tdi_port->OUT, _tdi_pin);
 
 	// for _tdo_port : GPIO IN
 	GPIO_SET_BIT(_tdo_port->CNF, _tdo_pin);
@@ -157,38 +159,44 @@ JetsonNanoJtagBitbang::JetsonNanoJtagBitbang(
 
 JetsonNanoJtagBitbang::~JetsonNanoJtagBitbang()
 {
-	GPIO_CLEAR_BIT(_tms_port->OE, _tms_pin);
-	GPIO_CLEAR_BIT(_tck_port->OE, _tck_pin);
-	GPIO_CLEAR_BIT(_tdi_port->OE, _tdi_pin);
+	GPIO_CLEAR_BIT_MSK(_tms_port->OE, _tms_pin);
+	GPIO_CLEAR_BIT_MSK(_tck_port->OE, _tck_pin);
+	GPIO_CLEAR_BIT_MSK(_tdi_port->OE, _tdi_pin);
 
-	GPIO_CLEAR_BIT(_tms_port->CNF, _tms_pin);
-	GPIO_CLEAR_BIT(_tck_port->CNF, _tck_pin);
-	GPIO_CLEAR_BIT(_tdi_port->CNF, _tdi_pin);
+	GPIO_CLEAR_BIT_MSK(_tms_port->CNF, _tms_pin);
+	GPIO_CLEAR_BIT_MSK(_tck_port->CNF, _tck_pin);
+	GPIO_CLEAR_BIT_MSK(_tdi_port->CNF, _tdi_pin);
 	GPIO_CLEAR_BIT(_tdo_port->CNF, _tdo_pin);
 }
 
 int JetsonNanoJtagBitbang::update_pins(int tck, int tms, int tdi)
 {
+	for(int i = 0; i < 20; i++)
+                asm("nop");
+
 	if (tdi != _curr_tdi) {
 		if(tdi)
-			GPIO_SET_BIT(_tdi_port->OUT, _tdi_pin);
+			GPIO_SET_BIT_MSK(_tdi_port->OUT, _tdi_pin);
 		else
-			GPIO_CLEAR_BIT(_tdi_port->OUT, _tdi_pin);
+			GPIO_CLEAR_BIT_MSK(_tdi_port->OUT, _tdi_pin);
 	}
 
 	if (tms != _curr_tms) {
 		if(tms)
-			GPIO_SET_BIT(_tms_port->OUT, _tms_pin);
+			GPIO_SET_BIT_MSK(_tms_port->OUT, _tms_pin);
 		else
-			GPIO_CLEAR_BIT(_tms_port->OUT, _tms_pin);
+			GPIO_CLEAR_BIT_MSK(_tms_port->OUT, _tms_pin);
 	}
 
 	if (tck != _curr_tck) {
 		if(tck)
-			GPIO_SET_BIT(_tck_port->OUT, _tck_pin);
+			GPIO_SET_BIT_MSK(_tck_port->OUT, _tck_pin);
 		else
-			GPIO_CLEAR_BIT(_tck_port->OUT, _tck_pin);
+			GPIO_CLEAR_BIT_MSK(_tck_port->OUT, _tck_pin);
 	}
+
+	for(int i = 0; i < 20; i++)
+		asm("nop");
 
 	_curr_tdi = tdi;
 	_curr_tms = tms;

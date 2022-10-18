@@ -34,10 +34,11 @@
  * function. This is convenient for those who have a different pinmux at boot.
  */
 #define GPIO_PORT_BASE				0x6000d000 // Port A
-#define GPIO_PORT_MAX				0x6000d708 // Port EE
-#define GPIO_PORT_SHORT_OFFSET_SIZE	4
-#define GPIO_PORT_SHORT_OFFSET		0x00000004
-#define GPIO_PORT_LARGE_OFFSET		0x00000100
+#define GPIO_PORT_BASE_OUT			0x6000d080 // Masked gpio
+#define GPIO_PORT_MAX				0x6000d788 // Port EE
+#define GPIO_PORT_SHORT_OFFSET_SIZE		4
+#define GPIO_PORT_SHORT_OFFSET			0x00000004
+#define GPIO_PORT_LARGE_OFFSET			0x00000100
 
 /*!
  * \file JetsonNanoJtagBitbang.hpp
