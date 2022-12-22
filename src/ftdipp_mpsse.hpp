@@ -8,20 +8,11 @@
 #include <ftdi.h>
 #include <string>
 
+#include "cable.hpp"
+
 class FTDIpp_MPSSE {
 	public:
-		typedef struct {
-			int vid;
-			int pid;
-			int interface;
-			int bit_low_val;
-			int bit_low_dir;
-			int bit_high_val;
-			int bit_high_dir;
-			int index;
-		} mpsse_bit_config;
-
-		FTDIpp_MPSSE(const mpsse_bit_config &cable, const std::string &dev,
+		FTDIpp_MPSSE(const cable_t &cable, const std::string &dev,
 			const std::string &serial, uint32_t clkHZ, int8_t verbose = 0);
 		~FTDIpp_MPSSE();
 
@@ -74,8 +65,8 @@ class FTDIpp_MPSSE {
 		int _pid;
 		int _index;
 	private:
-		int _bus;
-		int _addr;
+		uint8_t _bus;
+		uint8_t _addr;
 		char _product[64];
 		unsigned char _interface;
 		/* gpio */

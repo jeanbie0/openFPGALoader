@@ -79,7 +79,7 @@ SPIFlash::SPIFlash(SPIInterface *spi, bool unprotect, int8_t verbose):
 int SPIFlash::bulk_erase()
 {
 	int ret, ret2 = 0;
-	uint32_t timeout=100000;
+	uint32_t timeout=1000000;
 	uint8_t bp = get_bp();
 	if (bp != 0) {
 		if (!_unprotect) {
@@ -96,7 +96,7 @@ int SPIFlash::bulk_erase()
 		return ret;
 	ret2 = _spi->spi_put(FLASH_CE, NULL, NULL, 0);
 	if (ret2 == 0)
-		ret2 = _spi->spi_wait(FLASH_RDSR, FLASH_RDSR_WIP, 0x00, timeout, true);
+		ret2 = _spi->spi_wait(FLASH_RDSR, FLASH_RDSR_WIP, 0x00, timeout);
 
 	if (bp != 0)
 		ret = enable_protection(bp);
@@ -284,7 +284,7 @@ int SPIFlash::erase_and_prog(int base_addr, uint8_t *data, int len)
 	bool must_relock = false;  // used to relock after write;
 
 	/* microchip SST26VF032B have global lock set
-	 * at powerup. global unlock must be send inconditionally
+	 * at powerup. global unlock must be send unconditionally
 	 * with or without block protection
 	 */
 	if (_jedec_id == 0xbf2642bf) {  // microchip SST26VF032B
@@ -382,8 +382,11 @@ int SPIFlash::erase_and_prog(int base_addr, uint8_t *data, int len)
 bool SPIFlash::verify(const int &base_addr, const uint8_t *data,
 		const int &len, int rd_burst)
 {
-	if (rd_burst == 0)
+	if (rd_burst == 0) {
 		rd_burst = len;
+		if (rd_burst > 65536)
+			rd_burst = 65536;
+	}
 
 	printInfo("Verifying write (May take time)");
 
@@ -454,7 +457,7 @@ void SPIFlash::read_id()
 				_flash_model->nr_sector, _flash_model->nr_sector * 0x80000 / 1048576);
 		printInfo(content);
 	} else {
-		/* read extented */
+		/* read extended */
 		if ((_jedec_id & 0xff) != 0) {
 			has_edid = true;
 			len += (_jedec_id & 0x0ff);

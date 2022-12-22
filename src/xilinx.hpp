@@ -19,6 +19,7 @@ class Xilinx: public Device, SPIInterface {
 				const std::string &file_type,
 				Device::prog_type_t prg_type,
 				const std::string &device_package,
+				const std::string &spiOverJtagPath,
 				bool verify, int8_t verbose);
 		~Xilinx();
 
@@ -40,12 +41,18 @@ class Xilinx: public Device, SPIInterface {
 		bool unprotect_flash() override {
 			return SPIInterface::unprotect_flash();
 		}
+		/*!
+		 * \brief erase SPI flash blocks
+		 */
+		bool bulk_erase_flash() override {
+			return SPIInterface::bulk_erase_flash();
+		}
 
 		int idCode() override;
 		void reset() override;
 
 		/* -------------- */
-		/* xc3s managment */
+		/* xc3s management */
 		/* -------------- */
 
 		/*!
@@ -112,7 +119,7 @@ class Xilinx: public Device, SPIInterface {
 		 */
 		void xc2c_flow_reinit();
 		/*!
-		 * \brief erase full internal flash (optionnally verify)
+		 * \brief erase full internal flash (optionally verify)
 		 * \return false if erase fails, true otherwise
 		 */
 		bool xc2c_flow_erase();
@@ -159,6 +166,7 @@ class Xilinx: public Device, SPIInterface {
 			ZYNQ_FAMILY,
 			ZYNQMP_FAMILY,
 			XCF_FAMILY,
+			VIRTEXUSP_FAMILY,
 			UNKNOWN_FAMILY  = 999
 		};
 
@@ -167,7 +175,7 @@ class Xilinx: public Device, SPIInterface {
 		/*!
 		 * \brief xilinx ZynqMP Ultrascale+ specific initialization
 		 * \param[in] family name
-		 * \return true if device has been correctly initilized
+		 * \return true if device has been correctly initialized
 		 */
 		bool zynqmp_init(const std::string &family);
 
@@ -178,6 +186,7 @@ class Xilinx: public Device, SPIInterface {
 		 */
 		bool load_bridge();
 		std::string _device_package;
+		std::string _spiOverJtagPath; /**< spiOverJtag explicit path */
 		int _xc95_line_len; /**< xc95 only: number of col by flash line */
 		uint16_t _cpld_nb_row; /**< number of flash rows */
 		uint16_t _cpld_nb_col; /**< number of cols in a row */

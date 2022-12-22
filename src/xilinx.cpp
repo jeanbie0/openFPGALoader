@@ -24,14 +24,19 @@
 #include "xilinxMapParser.hpp"
 #include "part.hpp"
 #include "progressBar.hpp"
+#if defined (_WIN64) || defined (_WIN32)
+#include "pathHelper.hpp"
+#endif
 
 Xilinx::Xilinx(Jtag *jtag, const std::string &filename,
 	const std::string &file_type,
 	Device::prog_type_t prg_type,
-	const std::string &device_package, bool verify, int8_t verbose):
+	const std::string &device_package, const std::string &spiOverJtagPath,
+	bool verify, int8_t verbose):
 	Device(jtag, filename, file_type, verify, verbose),
 	SPIInterface(filename, verbose, 256, verify),
-	_device_package(device_package), _irlen(6)
+	_device_package(device_package), _spiOverJtagPath(spiOverJtagPath),
+	_irlen(6)
 {
 	if (prg_type == Device::RD_FLASH) {
 		_mode = Device::READ_MODE;
@@ -59,7 +64,11 @@ Xilinx::Xilinx(Jtag *jtag, const std::string &filename,
 		_fpga_family = SPARTAN7_FAMILY;
 	} else if (family == "zynq") {
 		_fpga_family = ZYNQ_FAMILY;
+		if (_mode != Device::MEM_MODE)
+			throw std::runtime_error("Error: can't flash Zynq7000");
 	} else if (family.substr(0, 6) == "zynqmp") {
+		if (_mode != Device::MEM_MODE)
+			throw std::runtime_error("Error: can't flash ZynqMP");
 		if (!zynqmp_init(family))
 			throw std::runtime_error("Error with ZynqMP init");
 		_fpga_family = ZYNQMP_FAMILY;
@@ -67,6 +76,8 @@ Xilinx::Xilinx(Jtag *jtag, const std::string &filename,
 		_fpga_family = KINTEX_FAMILY;
 	} else if (family == "kintexus") {
 		_fpga_family = KINTEXUS_FAMILY;
+	} else if (family == "virtexusp") {
+		_fpga_family = VIRTEXUSP_FAMILY;
 	} else if (family.substr(0, 8) == "spartan3") {
 		_fpga_family = SPARTAN3_FAMILY;
 		if (_mode != Device::MEM_MODE) {
@@ -314,14 +325,24 @@ void Xilinx::program(unsigned int offset, bool unprotect_flash)
 
 bool Xilinx::load_bridge()
 {
-	if (_device_package.empty()) {
-		printError("Can't program SPI flash: missing device-package information");
-		return false;
+	std::string bitname;
+	if (!_spiOverJtagPath.empty()) {
+		bitname = _spiOverJtagPath;
+	} else {
+		if (_device_package.empty()) {
+			printError("Can't program SPI flash: missing device-package information");
+			return false;
+		}
+
+		// DATA_DIR is defined at compile time.
+		bitname = DATA_DIR "/openFPGALoader/spiOverJtag_";
+		bitname += _device_package + ".bit.gz";
 	}
 
-	// DATA_DIR is defined at compile time.
-	std::string bitname = DATA_DIR "/openFPGALoader/spiOverJtag_";
-	bitname += _device_package + ".bit.gz";
+#if defined (_WIN64) || defined (_WIN32)
+	/* Convert relative path embedded at compile time to an absolute path */
+	bitname = PathHelper::absolutePath(bitname);
+#endif
 
 	std::cout << "use: " << bitname << std::endl;
 
@@ -435,7 +456,7 @@ void Xilinx::program_mem(ConfigBitstreamParser *bitfile)
 	/*
 	 * 17: Enter the SELECT-IR state.                     X     1   2
 	 * 18: Move to the SHIFT-IR state.                    X     0   2
-	 * 19: Start loading the JSTART instruction 
+	 * 19: Start loading the JSTART instruction
 	 *     (optional). The JSTART instruction           01100   0   5
 	 *     initializes the startup sequence.
 	 * 20: Load the last bit of the JSTART instruction.   0     1   1

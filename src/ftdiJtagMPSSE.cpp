@@ -30,7 +30,7 @@ using namespace std;
 #define display(...) do {}while(0)
 #endif
 
-FtdiJtagMPSSE::FtdiJtagMPSSE(const FTDIpp_MPSSE::mpsse_bit_config &cable,
+FtdiJtagMPSSE::FtdiJtagMPSSE(const cable_t &cable,
 			string dev, const string &serial, uint32_t clkHZ,
 			bool invert_read_edge, int8_t verbose):
 			FTDIpp_MPSSE(cable, dev, serial, clkHZ, verbose), _ch552WA(false),
@@ -39,7 +39,7 @@ FtdiJtagMPSSE::FtdiJtagMPSSE(const FTDIpp_MPSSE::mpsse_bit_config &cable,
 			_invert_read_edge(invert_read_edge), // false: pos, true: neg
 			_tdo_pos(0)
 {
-	init_internal(cable);
+	init_internal(cable.config);
 }
 
 FtdiJtagMPSSE::~FtdiJtagMPSSE()
@@ -65,7 +65,7 @@ FtdiJtagMPSSE::~FtdiJtagMPSSE()
 			"Loopback failed, expect problems on later runs %d\n", read);
 }
 
-void FtdiJtagMPSSE::init_internal(const FTDIpp_MPSSE::mpsse_bit_config &cable)
+void FtdiJtagMPSSE::init_internal(const mpsse_bit_config &cable)
 {
 	display("iProduct : %s\n", _iproduct);
 
@@ -217,7 +217,7 @@ int FtdiJtagMPSSE::writeTDI(uint8_t *tdi, uint8_t *tdo, uint32_t len, bool last)
 	 */
 	int tx_buff_size = mpsse_get_buffer_size();
 	int real_len = (last) ? len - 1 : len;  // if its a buffer in a big send send len
-						// else supress last bit -> with TMS
+						// else suppress last bit -> with TMS
 	int nb_byte = real_len >> 3;    // number of byte to send
 	int nb_bit = (real_len & 0x07); // residual bits
 	int xfer = tx_buff_size - 3;

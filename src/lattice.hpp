@@ -47,6 +47,12 @@ class Lattice: public Device, SPIInterface {
 		bool unprotect_flash() override {
 			return SPIInterface::unprotect_flash();
 		}
+		/*!
+		 * \brief bulk erase SPI flash
+		 */
+		bool bulk_erase_flash() override {
+			return SPIInterface::bulk_erase_flash();
+		}
 
 		/* spi interface */
 		int spi_put(uint8_t cmd, uint8_t *tx, uint8_t *rx,
@@ -67,7 +73,7 @@ class Lattice: public Device, SPIInterface {
 
 		lattice_family_t _fpga_family;
 
-		bool program_intFlash(JedParser& _jed);
+		bool program_intFlash(ConfigBitstreamParser *_cbp);
 		bool program_extFlash(unsigned int offset, bool unprotect_flash);
 		bool wr_rd(uint8_t cmd, uint8_t *tx, int tx_len,
 				uint8_t *rx, int rx_len, bool verbose = false);

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 # set the project name
-project(openFPGALoader VERSION "0.9.1" LANGUAGES CXX)
+project(openFPGALoader VERSION "0.10.0" LANGUAGES CXX)
 add_definitions(-DVERSION=\"v${PROJECT_VERSION}\")
 
 option(BUILD_STATIC "Whether or not to build with static libraries" OFF)
@@ -89,9 +89,10 @@ set(OPENFPGALOADER_SOURCE
 	src/fx2_ll.cpp
 	src/ice40.cpp
 	src/ihexParser.cpp
+	src/pofParser.cpp
+	src/rawParser.cpp
 	src/spiFlash.cpp
 	src/spiInterface.cpp
-	src/rawParser.cpp
 	src/usbBlaster.cpp
 	src/epcq.cpp
 	src/svf_jtag.cpp
@@ -105,6 +106,7 @@ set(OPENFPGALOADER_SOURCE
 	src/ftdipp_mpsse.cpp
 	src/main.cpp
 	src/latticeBitParser.cpp
+	src/libusb_ll.cpp
 	src/gowin.cpp
 	src/device.cpp
 	src/jlink.cpp
@@ -136,6 +138,7 @@ set(OPENFPGALOADER_HEADERS
 	src/fx2_ll.hpp
 	src/ice40.hpp
 	src/ihexParser.hpp
+	src/pofParser.hpp
 	src/progressBar.hpp
 	src/rawParser.hpp
 	src/usbBlaster.hpp
@@ -145,6 +148,7 @@ set(OPENFPGALOADER_HEADERS
 	src/jlink.hpp
 	src/jtag.hpp
 	src/jtagInterface.hpp
+	src/libusb_ll.hpp
 	src/fsparser.hpp
 	src/part.hpp
 	src/board.hpp
@@ -194,6 +198,9 @@ target_link_libraries(openFPGALoader
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	# winsock provides ntohs
 	target_link_libraries(openFPGALoader ws2_32)
+	
+	target_sources(openFPGALoader PRIVATE src/pathHelper.cpp)	
+	list(APPEND OPENFPGALOADER_HEADERS src/pathHelper.hpp)
 endif()
 
 # libusb_attach_kernel_driver is only available on Linux.

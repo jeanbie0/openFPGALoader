@@ -68,7 +68,7 @@ enum {
 };
 
 /*!
- * \brief a board has a target cable and optionnally a pin configuration
+ * \brief a board has a target cable and optionally a pin configuration
  * (bitbang mode)
  */
 typedef struct {
@@ -104,7 +104,9 @@ typedef struct {
 static std::map <std::string, target_board_t> board_list = {
 	JTAG_BOARD("ac701",           "xc7a200t2fbg676c", "digilent", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("acornCle215",     "xc7a200tsbg484", "",         0, 0, CABLE_DEFAULT),
+	JTAG_BOARD("litex-acorn-baseboard-mini", "xc7a200tsbg484", "", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("alchitry_au",     "xc7a35tftg256",  "ft2232",   0, 0, CABLE_DEFAULT),
+	JTAG_BOARD("alchitry_au_plus","xc7a100tftg256",  "ft2232",   0, 0, CABLE_DEFAULT),
 	/* left for backward compatibility, use right name instead */
 	JTAG_BOARD("arty",            "xc7a35tcsg324",  "digilent", 0, 0, CABLE_MHZ(10)),
 	JTAG_BOARD("arty_a7_35t",     "xc7a35tcsg324",  "digilent", 0, 0, CABLE_MHZ(10)),
@@ -113,10 +115,13 @@ static std::map <std::string, target_board_t> board_list = {
 	JTAG_BOARD("arty_s7_50",      "xc7s50csga324",  "digilent", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("arty_z7_10",      "xc7z010clg400",  "digilent", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("arty_z7_20",      "xc7z020clg400",  "digilent", 0, 0, CABLE_DEFAULT),
+	JTAG_BOARD("alinx_ax516",     "xc6slx16csg324", "",         0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("axu2cga",         "xczu2cg",        "",         0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("basys3",          "xc7a35tcpg236",  "digilent", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("cmod_s7",         "xc7s25csga225",  "digilent", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("cmoda7_35t",      "xc7a35tcpg236",  "digilent", 0, 0, CABLE_DEFAULT),
+	JTAG_BOARD("nexys_a7_50",     "xc7a50tcsg324",  "digilent", 0, 0, CABLE_DEFAULT),
+	JTAG_BOARD("nexys_a7_100",    "xc7a100tcsg324", "digilent", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("nexysVideo",      "xc7a200tsbg484", "digilent_b", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("kc705",           "", "digilent", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("zc702",           "xc7z020clg484", "digilent", 0, 0, CABLE_DEFAULT),
@@ -197,6 +202,9 @@ static std::map <std::string, target_board_t> board_list = {
 	JTAG_BOARD("zcu106",          "xczu7evffvc1156", "jtag-smt2-nc", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("zedboard",        "xc7z020clg484", "digilent_hs2", 0, 0, CABLE_DEFAULT),
 	JTAG_BOARD("papilio_one",     "xc3s500evq100", "papilio", 0, 0, CABLE_DEFAULT),
+	JTAG_BOARD("usrpx300",        "xc7k325tffg900", "digilent", 0, 0, CABLE_MHZ(15)),
+	JTAG_BOARD("usrpx310",        "xc7k410tffg900", "digilent", 0, 0, CABLE_MHZ(15)),
+	JTAG_BOARD("vcu118",          "xcvu9pl2flga2104e", "jtag-smt2-nc", 0, 0, CABLE_DEFAULT)
 };
 
 #endif

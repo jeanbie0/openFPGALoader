@@ -13,10 +13,31 @@
   Memory: OK
   Flash: OK
 
+- ID: litex-acorn-baseboard-mini
+  Description: The LiteX-Acorn-Baseboards are baseboards developed around the SQRL's Acorn board (or Nite/LiteFury)
+  URL: https://github.com/enjoy-digital/litex-acorn-baseboard/
+  FPGA: Artix xc7a200tsbg484
+  Memory: OK
+  Flash: OK
+
 - ID: alchitry_au
   Description: Alchitry Au
   URL: https://alchitry.com/products/alchitry-au-fpga-development-board
   FPGA: Artix xc7a35tftg256
+  Memory: OK
+  Flash: OK
+
+- ID: alchitry_au_plus
+  Description: Alchitry Au+ (Plus)
+  URL: https://www.sparkfun.com/products/17514
+  FPGA: Artix xc7a100tftg256
+  Memory: OK
+  Flash: OK
+
+- ID: alinx_ax516
+  Description: ALINX AX516
+  URL: https://www.alinx.com/en/detail/281
+  FPGA: Spartan6 xc6slx16csg324
   Memory: OK
   Flash: OK
 
@@ -341,6 +362,22 @@
   Memory: OK
   Flash: OK
 
+- ID: nexys_a7_50
+  Description: Digilent Nexys A7(Nexys 4 DDR)
+  URL: https://digilent.com/reference/programmable-logic/nexys-a7/start
+  FPGA: Artix xc7a50tcsg324
+  Memory: OK
+  Flash: OK
+  Constraints: Nexys4DDR
+
+- ID: nexys_a7_100
+  Description: Digilent Nexys A7(Nexys 4 DDR)
+  URL: https://digilent.com/reference/programmable-logic/nexys-a7/start
+  FPGA: Artix nexys_a7_100
+  Memory: OK
+  Flash: OK
+  Constraints: Nexys4DDR
+
 - ID: nexysVideo
   Description: Digilent Nexys Video
   URL: https://reference.digilentinc.com/reference/programmable-logic/nexys-video/start
@@ -535,6 +572,20 @@
   Memory: NA
   Flash: AS
 
+- ID: usrpx300
+  Description: Ettus Research USRP X300
+  URL: https://www.ettus.com/all-products/x300-kit/
+  FPGA: Kintex xc7k325tffg900
+  Memory: OK
+  Flash: NA
+
+- ID: usrpx310
+  Description: Ettus Research USRP X300
+  URL: https://www.ettus.com/all-products/x310-kit/
+  FPGA: Kintex xc7k410tffg900
+  Memory: OK
+  Flash: NA
+
 - ID: xmf3
   Description: PLDkit XMF3
   URL: https://pldkit.com/xilinx/xmf3
@@ -590,5 +641,12 @@
   Description: Digilent Zybo Z7-20
   URL: https://reference.digilentinc.com/reference/programmable-logic/zybo-z7/start
   FPGA: zynq7000 xc7z020clg400
+  Memory: OK
+  Flash: NA
+
+- ID: vcu118
+  Description: Xilinx VCU118
+  URL: https://www.xilinx.com/products/boards-and-kits/vcu118.html
+  FPGA: Virtex UltraScale+ xcvu9pl2flga2104e
   Memory: OK
   Flash: NA

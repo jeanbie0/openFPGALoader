@@ -55,12 +55,16 @@ openFPGALoader -- a program to flash FPGA
       --altsetting arg      DFU interface altsetting (only for DFU mode)
       --bitstream arg       bitstream
   -b, --board arg           board name, may be used instead of cable
+  -B, --bridge arg          disable spiOverJtag model detection by providing
+                            bitstream(intel/xilinx)
   -c, --cable arg           jtag interface
       --invert-read-edge    JTAG mode / FTDI: read on negative edge instead
                             of positive
       --vid arg             probe Vendor ID
       --pid arg             probe Product ID
       --cable-index arg     probe index (FTDI and cmsisDAP)
+      --busdev-num arg      select a probe by it bus and device number
+                            (bus_num:device_addr)
       --ftdi-serial arg     FTDI chip serial number
       --ftdi-channel arg    FTDI chip channel number (channels 0-3 map to
                             A-D)
@@ -90,6 +94,7 @@ openFPGALoader -- a program to flash FPGA
       --protect-flash arg   protect SPI flash area
       --quiet               Produce quiet output (no progress bar)
   -r, --reset               reset FPGA after operations
+      --scan-usb            scan USB to display connected probes
       --skip-load-bridge    skip writing bridge to SRAM when in write-flash
                             mode
       --skip-reset          skip resetting the device when in write-flash
